@@ -110,31 +110,31 @@ The application provides a workflow for data quality analysis and cleaning:
 
 Upload Dataset
 
-&#x20;     ↓
+     ↓
 
 Analyze Dataset
 
-&#x20;     ↓
+     ↓
 
 Detect Data Quality Problems
 
-&#x20;     ↓
+     ↓
 
 Show Problems to User
 
-&#x20;     ↓
+     ↓
 
 User Reviews / Selects Cleaning Operations
 
-&#x20;     ↓
+     ↓
 
 Apply Cleaning
 
-&#x20;     ↓
+     ↓
 
 Statistics \& Visualization
 
-&#x20;     ↓
+     ↓
 
 Export Cleaned Dataset
 
@@ -934,127 +934,73 @@ The initial implementation may support Linear Regression.
 
 
 
-\## Flow
-
-
-
-&#x20;                        ┌───────────────────────┐
-
-&#x20;                        │        USER           │
-
-&#x20;                        └───────────┬───────────┘
-
-&#x20;                                    │
-
-&#x20;            ┌───────────────────────┼──────────────────────┐
-
-&#x20;            │                       │                      │
-
-&#x20;            ▼                       ▼                      ▼
-
-&#x20;     Upload Dataset         Analyze Dataset        View Summary
-
-&#x20;                                    │
-
-&#x20;                                    ▼
-
-&#x20;                        Detect Data Quality Problems
-
-&#x20;                                    │
-
-&#x20;                         ┌──────────┴──────────┐
-
-&#x20;                         │                     │
-
-&#x20;                         ▼                     ▼
-
-&#x20;               Select Cleaning        View Visualization
-
-&#x20;                    Operation
-
-&#x20;                         │
-
-&#x20;                         ▼
-
-&#x20;                 Apply Cleaning
-
-&#x20;                         │
-
-&#x20;                         ├──────────────► Export Dataset
-
-&#x20;                         │
-
-&#x20;                         └──────────────► Machine Learning
-
-
-
-
-
-\### Planned System Architecture
-
-
-
-&#x20;                   USER
-
-&#x20;                    │
-
-&#x20;                    ▼
-
-&#x20;             ┌─────────────┐
-
-&#x20;             │    React    │
-
-&#x20;             │  Frontend   │
-
-&#x20;             └──────┬──────┘
-
-&#x20;                    │
-
-&#x20;                 REST API
-
-&#x20;                    │
-
-&#x20;                    ▼
-
-&#x20;             ┌─────────────┐
-
-&#x20;             │   FastAPI   │
-
-&#x20;             │   Python    │
-
-&#x20;             └──────┬──────┘
-
-&#x20;                    │
-
-&#x20;         ┌──────────┼──────────┐
-
-&#x20;         ▼          ▼          ▼
-
-&#x20;     ┌────────┐ ┌───────┐ ┌──────────┐
-
-&#x20;     │ Pandas │ │  ML   │ │PostgreSQL│
-
-&#x20;     │        │ │       │ │ Metadata │
-
-&#x20;     └────┬───┘ └───────┘ └──────────┘
-
-&#x20;          │
-
-&#x20;          ▼
-
-&#x20;     ┌─────────────┐
-
-&#x20;     │ CSV Storage │
-
-&#x20;     │             │
-
-&#x20;     │ original/   │
-
-&#x20;     │ processed/  │
-
-&#x20;     └─────────────┘
-
-
+## Flow
+
+```mermaid
+flowchart TD
+    User["User"]
+
+    Upload["Upload Dataset"]
+    Analyze["Analyze Dataset"]
+    Summary["View Data Summary"]
+    Detect["Detect Data Quality Problems"]
+    SelectClean["Select Cleaning Operation"]
+    Clean["Apply Cleaning"]
+    Visualize["View Visualization"]
+    Export["Export Dataset"]
+    ML["Basic Machine Learning"]
+
+    User --> Upload
+    User --> Analyze
+    User --> Summary
+
+    Upload --> Analyze
+    Analyze --> Detect
+    Analyze --> Summary
+
+    Detect --> SelectClean
+    SelectClean --> Clean
+
+    Clean --> Export
+    Clean --> Visualize
+    Clean --> ML
+```
+
+### Planned System Architecture
+
+```mermaid
+flowchart TB
+    User["User"]
+
+    subgraph Docker["Docker Environment"]
+
+        subgraph Frontend["Frontend"]
+            React["React"]
+        end
+
+        subgraph Backend["Backend"]
+            API["FastAPI<br/>Python"]
+            Pandas["Pandas<br/>Data Processing"]
+            ML["Machine Learning<br/>scikit-learn / PyTorch"]
+        end
+
+        subgraph Storage["Storage"]
+            DB["PostgreSQL<br/>Metadata"]
+            Files["File Storage<br/>CSV Files"]
+        end
+    end
+
+    User --> React
+    React -->|"REST API"| API
+
+    API --> Pandas
+    API --> ML
+    API --> DB
+    API --> Files
+
+    Files --> Pandas
+    Pandas --> Files
+```
 
 
 
